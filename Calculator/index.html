@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scientific Calculator</title>
+    <style>
+        :root {
+            --bg-color: #f0f0f0;
+            --calc-bg: #ffffff;
+            --btn-bg: #e0e0e0;
+            --text-color: #333;
+        }
+
+        .calculator {
+            background-color: var(--calc-bg);
+            padding: 20px;
+            border-radius: 10px;
+            width: 320px;
+            margin: 20px auto;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .calculator[data-theme="dark"] {
+            --bg-color: #1a1a1a;
+            --calc-bg: #2d2d2d;
+            --btn-bg: #404040;
+            --text-color: #fff;
+        }
+
+        .calculator[data-theme="neon"] {
+            --bg-color: #000;
+            --calc-bg: #001f3f;
+            --btn-bg: #0074D9;
+            --text-color: #7FDBFF;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: Arial, sans-serif;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        #display {
+            width: 100%;
+            height: 60px;
+            margin-bottom: 10px;
+            font-size: 24px;
+            text-align: right;
+            padding: 5px;
+            background-color: var(--calc-bg);
+            color: var(--text-color);
+            border: 1px solid var(--btn-bg);
+            border-radius: 5px;
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 5px;
+        }
+
+        button {
+            padding: 15px;
+            font-size: 18px;
+            border: none;
+            border-radius: 5px;
+            background-color: var(--btn-bg);
+            color: var(--text-color);
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        button:hover {
+            opacity: 0.8;
+        }
+
+        .operator {
+            background-color: #ff9500;
+        }
+
+        .theme-selector {
+            margin-bottom: 10px;
+        }
+
+        select {
+            padding: 5px;
+            background-color: var(--btn-bg);
+            color: var(--text-color);
+            border: 1px solid var(--text-color);
+            border-radius: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="calculator" data-theme="default">
+        <select class="theme-selector" onchange="changeTheme(this.value)">
+            <option value="default">Default Theme</option>
+            <option value="dark">Dark Theme</option>
+            <option value="neon">Neon Theme</option>
+        </select>
+        <input type="text" id="display" readonly>
+        <div class="buttons">
+            <!-- Scientific functions -->
+            <button onclick="appendToDisplay('sin(')">sin</button>
+            <button onclick="appendToDisplay('cos(')">cos</button>
+            <button onclick="appendToDisplay('tan(')">tan</button>
+            <button onclick="appendToDisplay('sqrt(')">√</button>
+            <button onclick="appendToDisplay('^')">x^y</button>
+
+            <button onclick="appendToDisplay('(')">(</button>
+            <button onclick="appendToDisplay(')')">)</button>
+            <button onclick="appendToDisplay('π')">π</button>
+            <button onclick="appendToDisplay('E')">e</button>
+            <button onclick="clearDisplay()">C</button>
+
+            <button onclick="appendToDisplay('7')">7</button>
+            <button onclick="appendToDisplay('8')">8</button>
+            <button onclick="appendToDisplay('9')">9</button>
+            <button class="operator" onclick="appendToDisplay('/')">÷</button>
+            <button onclick="appendToDisplay('log(')">log</button>
+
+            <button onclick="appendToDisplay('4')">4</button>
+            <button onclick="appendToDisplay('5')">5</button>
+            <button onclick="appendToDisplay('6')">6</button>
+            <button class="operator" onclick="appendToDisplay('*')">×</button>
+            <button onclick="appendToDisplay('ln(')">ln</button>
+
+            <button onclick="appendToDisplay('1')">1</button>
+            <button onclick="appendToDisplay('2')">2</button>
+            <button onclick="appendToDisplay('3')">3</button>
+            <button class="operator" onclick="appendToDisplay('-')">-</button>
+            <button onclick="calculate()" style="grid-row: span 2">=</button>
+
+            <button onclick="appendToDisplay('0')">0</button>
+            <button onclick="appendToDisplay('.')">.</button>
+            <button onclick="appendToDisplay('%')">%</button>
+            <button class="operator" onclick="appendToDisplay('+')">+</button>
+        </div>
+    </div>
+
+    <script>
+        const display = document.getElementById('display');
+
+        function appendToDisplay(value) {
+            display.value += value;
+        }
+
+        function clearDisplay() {
+            display.value = '';
+        }
+
+        function calculate() {
+            try {
+                let expression = display.value
+                    .replace(/sin/g, 'Math.sin')
+                    .replace(/cos/g, 'Math.cos')
+                    .replace(/tan/g, 'Math.tan')
+                    .replace(/sqrt/g, 'Math.sqrt')
+                    .replace(/log/g, 'Math.log10')
+                    .replace(/ln/g, 'Math.log')
+                    .replace(/π/g, Math.PI)
+                    .replace(/E/g, Math.E)
+                    .replace(/\^/g, '**');
+
+                let result = eval(expression);
+                display.value = result;
+            } catch (error) {
+                display.value = 'Error';
+            }
+        }
+
+        function changeTheme(theme) {
+            const calculator = document.querySelector('.calculator');
+            calculator.setAttribute('data-theme', theme);
+        }
+    </script>
+</body>
+
+</html>
