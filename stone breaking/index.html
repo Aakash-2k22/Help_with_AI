@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mystery Stone Game</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #2c3e50;
+            font-family: Arial, sans-serif;
+        }
+
+        #game-container {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 10px;
+            margin: 20px;
+            max-width: 800px;
+        }
+
+        .stone {
+            width: 50px;
+            height: 50px;
+            background-color: #7f8c8d;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            color: white;
+            transition: transform 0.1s;
+        }
+
+        .stone.clicked {
+            background-color: #27ae60 !important;
+        }
+
+        .stone.bomb {
+            background-color: #e74c3c !important;
+        }
+
+        #score {
+            color: white;
+            font-size: 24px;
+            margin: 20px;
+        }
+
+        #reset {
+            padding: 10px 20px;
+            font-size: 18px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 20px;
+        }
+
+        #reset:hover {
+            background-color: #2980b9;
+        }
+    </style>
+</head>
+<body>
+    <div id="score">Remaining Stones: 29</div>
+    <div id="game-container"></div>
+    <button id="reset">New Game</button>
+
+    <script>
+        const gameContainer = document.getElementById('game-container');
+        const scoreElement = document.getElementById('score');
+        const resetButton = document.getElementById('reset');
+        const totalStones = 30;
+        let remainingSafeStones;
+        let bombIndex;
+        let gameActive = true;
+
+        function createStones() {
+            gameContainer.innerHTML = '';
+            gameActive = true;
+            remainingSafeStones = totalStones - 1; // One bomb
+            scoreElement.textContent = `Remaining Stones: ${remainingSafeStones}`;
+            
+            // Randomly select bomb position
+            bombIndex = Math.floor(Math.random() * totalStones);
+
+            for (let i = 0; i < totalStones; i++) {
+                const stone = document.createElement('div');
+                stone.className = 'stone';
+                stone.dataset.index = i;
+                
+                if (i === bombIndex) {
+                    stone.dataset.isBomb = 'true';
+                } else {
+                    stone.dataset.isBomb = 'false';
+                }
+
+                stone.addEventListener('click', handleStoneClick);
+                gameContainer.appendChild(stone);
+            }
+        }
+
+        function handleStoneClick(event) {
+            if (!gameActive) return;
+            
+            const stone = event.target;
+            const isBomb = stone.dataset.isBomb === 'true';
+            
+            stone.style.pointerEvents = 'none'; // Disable further clicks
+
+            if (isBomb) {
+                // Reveal bomb and end game
+                stone.textContent = '💣';
+                stone.classList.add('bomb');
+                gameActive = false;
+                setTimeout(() => {
+                    alert('Game Over! You clicked the bomb!');
+                    resetGame();
+                }, 300);
+            } else {
+                // Mark as safe stone
+                stone.textContent = '✅';
+                stone.classList.add('clicked');
+                remainingSafeStones--;
+                scoreElement.textContent = `Remaining Stones: ${remainingSafeStones}`;
+                
+                if (remainingSafeStones === 0) {
+                    gameActive = false;
+                    setTimeout(() => {
+                        alert('Congratulations! You won!');
+                        resetGame();
+                    }, 300);
+                }
+            }
+        }
+
+        function resetGame() {
+            createStones();
+        }
+
+        // Initialize game
+        createStones();
+        resetButton.addEventListener('click', resetGame);
+    </script>
+</body>
+</html>
